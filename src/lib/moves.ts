@@ -58,7 +58,12 @@ export function getKnightMoves(board: Board, index: number) {
     if (!isIndexValid(newIdx)) continue;
     const newSquare = board[newIdx];
     if (newSquare && square.color === newSquare.color) continue;
-    moves.push({ from: index, to: newIdx, type: "normal" });
+    moves.push({
+      from: index,
+      to: newIdx,
+      type: "normal",
+      capturedPiece: newSquare?.piece,
+    });
   }
   return moves;
 }
@@ -72,7 +77,12 @@ export function getBishopMoves(board: Board, index: number) {
     while (isIndexValid(newIdx)) {
       const newSquare = board[newIdx];
       if (newSquare && square.color === newSquare.color) break;
-      moves.push({ from: index, to: newIdx, type: "normal" });
+      moves.push({
+        from: index,
+        to: newIdx,
+        type: "normal",
+        capturedPiece: newSquare?.piece,
+      });
       if (newSquare && square.color !== newSquare.color) break;
       newIdx += direction;
     }
@@ -89,7 +99,12 @@ export function getRookMoves(board: Board, index: number) {
     while (isIndexValid(newIdx)) {
       const newSquare = board[newIdx];
       if (newSquare && square.color === newSquare.color) break;
-      moves.push({ from: index, to: newIdx, type: "normal" });
+      moves.push({
+        from: index,
+        to: newIdx,
+        type: "normal",
+        capturedPiece: newSquare?.piece,
+      });
       if (newSquare && square.color !== newSquare.color) break;
       newIdx += direction;
     }
@@ -114,7 +129,12 @@ export function getKingMoves(
     if (!isIndexValid(newIdx)) continue;
     const newSquare = board[newIdx];
     if (newSquare && square.color === newSquare.color) continue;
-    moves.push({ from: index, to: newIdx, type: "normal" });
+    moves.push({
+      from: index,
+      to: newIdx,
+      type: "normal",
+      capturedPiece: newSquare?.piece,
+    });
   }
   // castle
   if (square.color && index === 74) {
@@ -160,12 +180,22 @@ export function getPawnMoves(
   for (const dir of [1, -1]) {
     const captureIdx = frontIdx + dir;
     if (captureIdx === enpassantTargetIdx) {
-      moves.push({ from: index, to: captureIdx, type: "enpassant" });
+      moves.push({
+        from: index,
+        to: captureIdx,
+        type: "enpassant",
+        capturedPiece: "p",
+      });
       continue;
     }
     const captureSquare = board[captureIdx];
     if (captureSquare && captureSquare.color !== square.color)
-      moves.push({ from: index, to: captureIdx, type: "normal" });
+      moves.push({
+        from: index,
+        to: captureIdx,
+        type: "normal",
+        capturedPiece: captureSquare.piece,
+      });
   }
   moves.forEach((move) => {
     if (Math.floor(move.to / 10) === 3.5 + colorValue * 3.5)
@@ -207,4 +237,24 @@ export function findAllMoves(position: Position) {
     }
   }
   return moves;
+}
+
+export function findOccurencesOfPiece(
+  board: Board,
+  piece: string,
+  color: boolean,
+  ignore: number[] = []
+) {
+  const indexes: number[] = [];
+  for (const index in board) {
+    const square = board[index];
+    if (
+      square.color === color &&
+      square.piece === piece &&
+      !ignore.includes(square.index)
+    ) {
+      indexes.push(parseInt(index));
+    }
+  }
+  return indexes;
 }

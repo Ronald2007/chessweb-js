@@ -1,15 +1,7 @@
 import { Board, Position } from "../types/index.js";
 
-export function convertFENtoPosition(fen: string): Position {
-  const [
-    textPosition,
-    turn,
-    castleRights,
-    enpassantTarget,
-    halfmoves,
-    fullmoves,
-  ] = fen.split(" ");
-
+export function convertFENtoBoard(fen: string): Board {
+  const textPosition = fen.split(" ")[0];
   const board: Board = {};
   let row = 0;
   let col = 0;
@@ -26,6 +18,20 @@ export function convertFENtoPosition(fen: string): Position {
       col++;
     }
   }
+  return board;
+}
+
+export function convertFENtoPosition(fen: string): Position {
+  const [
+    textPosition,
+    turn,
+    castleRights,
+    enpassantTarget,
+    halfmoves,
+    fullmoves,
+  ] = fen.split(" ");
+
+  const board = convertFENtoBoard(textPosition);
 
   return {
     fen,

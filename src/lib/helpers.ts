@@ -1,4 +1,4 @@
-import { Point } from "../types/index.js";
+import { Point, Position } from "../types/index.js";
 import { letters } from "./constants.js";
 
 export function convertIndexToPoint(index: number, squareSize: number) {
@@ -16,12 +16,16 @@ export function clamp(num: number, max: number, min: number = 0) {
   else return num;
 }
 
-export function convertPointToIndex(point: Point, squareSize: number) {
+export function convertPointToIndex(
+  point: Point,
+  squareSize: number,
+  flip: boolean = false
+) {
   const [row, col] = [
     clamp(Math.floor(point.y / squareSize), 7),
     clamp(Math.floor(point.x / squareSize), 7),
   ];
-  return row * 10 + col;
+  return Math.abs((flip ? 77 : 0) - (row * 10 + col));
 }
 
 export function createElement<T extends keyof HTMLElementTagNameMap>(
@@ -52,8 +56,24 @@ export function convertIndexToTarget(index: number) {
   return `${letters[col]}${8 - row}`;
 }
 
-export function translatePoint(point: Point, squareSize: number): string {
-  return `translate(${(point.x / squareSize) * 100}%, ${
-    (point.y / squareSize) * 100
-  }%)`;
+export function translatePoint(
+  point: Point,
+  squareSize: number,
+  flip: boolean = false
+): string {
+  return `translate(${
+    Math.abs((flip ? 7 : 0) - point.x / squareSize) * 100
+  }%, ${Math.abs((flip ? 7 : 0) - point.y / squareSize) * 100}%)`;
+}
+
+export function emptyPosition(): Position {
+  return {
+    board: {},
+    castleRights: null,
+    enpassantTarget: null,
+    fen: "",
+    fullmoves: 0,
+    halfmoves: 0,
+    turn: true,
+  };
 }

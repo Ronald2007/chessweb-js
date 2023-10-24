@@ -6,6 +6,7 @@ export interface Position {
   enpassantTarget: string | null;
   halfmoves: number;
   fullmoves: number;
+  prevMove?: PieceMove & { notation: string };
 }
 export type Board = Record<number, Square>;
 export interface Square {
@@ -16,6 +17,7 @@ export interface Square {
 export interface PieceMove {
   from: number;
   to: number;
+  capturedPiece?: string;
   type: "normal" | "castle" | "enpassant" | "promotion";
 }
 export interface BoardChange {
@@ -34,4 +36,7 @@ export type Point = { x: number; y: number };
 export interface GameController {
   flip: (direction?: boolean) => boolean;
   changePosition: (position: string | Position) => void;
+  clearBoard: () => void;
+  getOrientation: () => boolean;
+  destroy: () => void;
 }

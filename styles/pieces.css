@@ -1,0 +1,49 @@
+/* White */
+.piece.wp::before {
+  background-image: url("../assets/pieces/wp.svg");
+}
+
+.piece.wk::before {
+  background-image: url("../assets/pieces/wk.svg");
+}
+
+.piece.wq::before {
+  background-image: url("../assets/pieces/wq.svg");
+}
+
+.piece.wr::before {
+  background-image: url("../assets/pieces/wr.svg");
+}
+
+.piece.wb::before {
+  background-image: url("../assets/pieces/wb.svg");
+}
+
+.piece.wn::before {
+  background-image: url("../assets/pieces/wn.svg");
+}
+
+/* Black */
+.piece.bp::before {
+  background-image: url("../assets/pieces/bp.svg");
+}
+
+.piece.bk::before {
+  background-image: url("../assets/pieces/bk.svg");
+}
+
+.piece.bq::before {
+  background-image: url("../assets/pieces/bq.svg");
+}
+
+.piece.br::before {
+  background-image: url("../assets/pieces/br.svg");
+}
+
+.piece.bb::before {
+  background-image: url("../assets/pieces/bb.svg");
+}
+
+.piece.bn::before {
+  background-image: url("../assets/pieces/bn.svg");
+}

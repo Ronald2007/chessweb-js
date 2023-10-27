@@ -1,3 +1,5 @@
+import { BoardConfig } from "../types/index";
+
 export const INITIAL_FEN =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 export const PROMOTION_FEN =
@@ -12,3 +14,12 @@ export const COLOR_PIECES = [
 ];
 
 export const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+
+export const DEFAULT_BOARD_CONFIG: BoardConfig = {
+  showCoordinates: false,
+  animationDuration: 150,
+  draggable: true,
+  playable: true,
+  flipped: false,
+  onChange: undefined,
+};

@@ -1,5 +1,10 @@
 import { convertFENtoPosition, convertPositionToFen } from "./lib/fen.js";
-import { COLOR_PIECES } from "./lib/constants.js";
+import {
+  COLOR_PIECES,
+  DEFAULT_BOARD_CONFIG,
+  INITIAL_FEN,
+  letters,
+} from "./lib/constants.js";
 import {
   convertIndexToPoint,
   clamp,
@@ -9,6 +14,7 @@ import {
 } from "./lib/helpers.js";
 import {
   Board,
+  BoardConfig,
   BoardDifference,
   GameController,
   PieceMove,
@@ -22,17 +28,23 @@ import { convertMoveToNotation } from "./lib/notation.js";
 // root element, start position, callback with new position(newPosition)
 export function chessboard(
   boardDiv: HTMLDivElement,
-  startPosition: Position | string,
-  onMove?: (position: Position) => void
+  startPosition: Position | string = INITIAL_FEN,
+  boardConfig: BoardConfig = DEFAULT_BOARD_CONFIG
 ) {
+  const config = {
+    ...DEFAULT_BOARD_CONFIG,
+    ...boardConfig,
+  } as Required<BoardConfig>;
+
   let boardRect = boardDiv.getBoundingClientRect();
   const overDiv = createElement("div", "square", "over", "hidden");
   const selectedDiv = createElement("div", "square", "selected", "hidden");
   const ghostDiv = createElement("div", "ghost", "piece", "hidden");
+  const rootEl = document.querySelector<HTMLHtmlElement>(":root");
 
-  let BOARD_SIZE = boardRect.height;
-  let SQUARE_SIZE = BOARD_SIZE / 8;
-  let CENTER = SQUARE_SIZE / 2;
+  let BOARD_SIZE = 0,
+    SQUARE_SIZE = 0,
+    CENTER = 0;
 
   const position =
     typeof startPosition === "string"
@@ -40,11 +52,14 @@ export function chessboard(
       : startPosition;
 
   let possibleMoves: PieceMove[] = findAllMoves(position);
-  let flip = false;
+  let flip = config.flipped;
 
   function initialize(): GameController {
     // create board size & add update on every resize
     setBoardSize();
+    boardDiv.append(overDiv, selectedDiv, ghostDiv);
+
+    // boardDiv.addEventListener("pointerdown", onDragStart);
     let timeout: NodeJS.Timeout; // holder for timeout id
     const delay = 250;
     window.addEventListener("resize", () => {
@@ -52,11 +67,19 @@ export function chessboard(
       timeout = setTimeout(setBoardSize, delay);
     });
 
-    boardDiv.append(overDiv, selectedDiv, ghostDiv);
-    boardDiv.addEventListener("pointerdown", onDragStart);
     displayBoard(position.board);
+    setupBoardConfig();
 
     return createBoardController();
+  }
+
+  function setupBoardConfig() {
+    setAnimationDurationTo(config.animationDuration);
+    flipBoard(config.flipped);
+    if (config.playable) {
+      boardDiv.addEventListener("pointerdown", onDragStart);
+    }
+    toggleCoordinates(config.showCoordinates);
   }
 
   function createBoardController(): GameController {
@@ -66,37 +89,67 @@ export function chessboard(
       clearBoard,
       getOrientation: () => flip,
       destroy: () => (boardDiv.innerHTML = ""),
+      toggleCoordinates,
+      getFen: () => position.fen,
+      getPosition: () => position,
     };
   }
 
   function setBoardSize() {
-    const rootElement = document.querySelector<HTMLHtmlElement>(":root");
-    if (!rootElement) return;
     const parentElement = boardDiv.parentElement;
     let size: number;
     if (!parentElement) {
-      const { height, width } = rootElement.getBoundingClientRect();
+      if (!rootEl) return;
+      const { height, width } = rootEl.getBoundingClientRect();
       size = clamp(height, width);
     } else {
       const { height, width } = parentElement.getBoundingClientRect();
       size = clamp(height, width);
     }
-    const padding = size % 8;
+    const coorBarLen = config.showCoordinates ? Math.round(size / 32) : 0;
+    size -= coorBarLen;
+    const padding = (size % 8) / 2;
     size = Math.floor(size / 8) * 8;
 
-    rootElement.style.setProperty("--board-size", `${size}px`);
-    boardDiv.style.margin = `${padding / 2}px ${padding / 2}px`;
+    rootEl?.style.setProperty("--board-size", `${size}px`);
+    boardDiv.style.margin = `${padding}px ${padding}px ${
+      padding + coorBarLen
+    }px ${padding + coorBarLen}px`;
     boardRect = boardDiv.getBoundingClientRect();
     BOARD_SIZE = boardRect.height;
     SQUARE_SIZE = BOARD_SIZE / 8;
     CENTER = SQUARE_SIZE / 2;
   }
 
+  function toggleCoordinates(show: boolean = true) {
+    if (!show) {
+      boardDiv.querySelectorAll(".coordinates").forEach((el) => el.remove());
+    } else {
+      const numbersBar = createElement("div", "coordinates", "vertical");
+      for (let i = 0; i < 8; i++) {
+        const coorDiv = createElement("div", "coor");
+        coorDiv.innerHTML = `<h6>${(i + 1).toString()}</h6>`;
+        numbersBar.append(coorDiv);
+      }
+      const lettersBar = createElement("div", "coordinates", "horizontal");
+      for (const letter of letters) {
+        const coorDiv = createElement("div", "coor");
+        coorDiv.innerHTML = `<h6>${letter}</h6>`;
+        lettersBar.append(coorDiv);
+      }
+      boardDiv.append(numbersBar, lettersBar);
+    }
+    config.showCoordinates = show;
+    setBoardSize();
+  }
+
+  function setAnimationDurationTo(value: number) {
+    rootEl?.style.setProperty("--animation-duration", `${value}ms`);
+  }
+
   function flipBoard(direction?: boolean) {
     flip = direction !== undefined ? direction : !flip;
-    document
-      .querySelector<HTMLHtmlElement>(":root")
-      ?.style.setProperty("--flip-rotation", `${flip ? 180 : 0}deg`);
+    rootEl?.style.setProperty("--flip-rotation", `${flip ? 180 : 0}deg`);
     return flip;
   }
 
@@ -105,25 +158,29 @@ export function chessboard(
     boardDiv.querySelector(".piece.dragged")?.classList.remove("dragged");
     boardDiv.querySelector(".piece.ghost")?.classList.remove(...COLOR_PIECES);
     boardDiv.querySelector(".piece.ghost")?.classList.add("hidden");
-    boardDiv.querySelector(".square.selected")?.classList.remove("selected");
+    boardDiv.querySelector(".square.selected")?.classList.add("hidden");
     boardDiv.querySelector(".square.over")?.classList.add("hidden");
     createPossibleMoves([]);
   }
 
-  function clearBoard() {
+  function clearBoard(animate: boolean = false) {
     clearBoardIndicators();
-    displayBoard([]);
+    updateBoard([], animate);
   }
 
-  function changePosition(fenOrPosition: Position | string) {
+  function changePosition(
+    fenOrPosition: Position | string,
+    animate: boolean = true
+  ) {
     const newPosition =
       typeof fenOrPosition === "string"
         ? convertFENtoPosition(fenOrPosition)
         : fenOrPosition;
     const differences = findDifferences(position.board, newPosition.board);
-    updateBoard(differences);
+    updateBoard(differences, animate);
     Object.assign(position, newPosition);
     possibleMoves = findAllMoves(position);
+    config.onChange?.(position, "changed");
   }
 
   function displayBoard(board: Board) {
@@ -142,9 +199,13 @@ export function chessboard(
     }
   }
 
-  function updateBoard(differences: BoardDifference[]) {
+  function updateBoard(
+    differences: BoardDifference[],
+    animate: boolean = true
+  ) {
     clearBoardIndicators();
-    console.log(differences);
+    if (!animate) setAnimationDurationTo(0);
+
     for (const difference of differences) {
       let pieceDiv: HTMLDivElement | null = null;
       if (difference.from === -1) {
@@ -169,6 +230,9 @@ export function chessboard(
       pieceDiv.style.transform = translatePoint(point, SQUARE_SIZE);
       pieceDiv.dataset.index = difference.to.toString();
     }
+    // setTimeout to 0, otherwise duration will be applied again
+    if (!animate)
+      setTimeout(() => setAnimationDurationTo(config.animationDuration), 0);
   }
 
   function createPiece(point: Point, name: string, index: number) {
@@ -239,7 +303,7 @@ export function chessboard(
     }
 
     possibleMoves = findAllMoves(position);
-    onMove?.(position);
+    config.onChange?.(position, "newmove");
     // displayBoard(position.board);
   }
 
@@ -285,7 +349,7 @@ export function chessboard(
         ?.classList.replace(code, code[0] + piece);
     }
     possibleMoves = findAllMoves(position);
-    onMove?.(position);
+    config.onChange?.(position, "newmove");
   }
 
   function onDragStart(e: MouseEvent) {
@@ -295,9 +359,6 @@ export function chessboard(
       y: clamp(e.clientY - boardRect.top, BOARD_SIZE, 0),
     };
     const dragIndex = convertPointToIndex(point, SQUARE_SIZE, flip);
-    const dragTarget = boardDiv.querySelector<HTMLDivElement>(
-      `.piece[data-index="${dragIndex}"]`
-    );
     const square = position.board[dragIndex];
     const selectedPieceDiv =
       boardDiv.querySelector<HTMLDivElement>(".piece.selected");
@@ -310,6 +371,9 @@ export function chessboard(
       if (!square || square.color !== selectedSquare?.color)
         return onDragEnd(e);
     }
+    const dragTarget = boardDiv.querySelector<HTMLDivElement>(
+      `.piece[data-index="${dragIndex}"]`
+    );
     if (!dragTarget || !square || square.color !== position.turn) return;
 
     selectedPieceDiv?.classList.remove("selected");
@@ -317,7 +381,9 @@ export function chessboard(
     createPossibleMoves(
       possibleMoves.filter((move) => move.from === dragIndex)
     );
-    document.addEventListener("pointermove", onDragMove);
+    if (config.draggable) {
+      document.addEventListener("pointermove", onDragMove);
+    }
     document.addEventListener("pointerup", onDragEnd);
     const selectedPoint = convertIndexToPoint(dragIndex, SQUARE_SIZE);
     // show indicator on square that the piece was selected
@@ -337,7 +403,6 @@ export function chessboard(
     const dragTarget =
       boardDiv.querySelector<HTMLDivElement>(".piece.selected");
     if (!dragTarget) return selectedDiv?.classList.add("hidden");
-
     dragTarget.classList.add("dragged");
 
     // pointer position relative to board
@@ -345,6 +410,7 @@ export function chessboard(
       x: clamp(e.clientX - boardRect.left, BOARD_SIZE, 0),
       y: clamp(e.clientY - boardRect.top, BOARD_SIZE, 0),
     };
+    console.log(point);
 
     dragTarget.style.transform =
       translatePoint(

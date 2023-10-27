@@ -1,24 +1,20 @@
 import { chessboard } from "./board.js";
-import { INITIAL_FEN, SAMPLE_FEN } from "./lib/constants.js";
-import { convertFENtoPosition } from "./lib/fen.js";
-import { convertMoveToNotation } from "./lib/notation.js";
+import { INITIAL_FEN } from "./lib/constants.js";
+import { Move } from "./types/index.js";
 
 function onWindowLoad() {
   const boardDiv = document.querySelector<HTMLDivElement>(".board");
   if (!boardDiv) return;
-  const controller = chessboard(boardDiv, INITIAL_FEN, (position) =>
-    console.log(position.prevMove?.notation)
-  );
+  const moves: Move[] = [];
+
+  const controller = chessboard(boardDiv, INITIAL_FEN, {
+    animationDuration: 0,
+    onChange: (position) => moves.push(position),
+  });
 
   document
     .querySelector<HTMLButtonElement>(".flip-btn")
     ?.addEventListener("click", () => controller.flip());
-
-  const notation = convertMoveToNotation(
-    { to: 44, from: 64, type: "normal" },
-    convertFENtoPosition(INITIAL_FEN).board
-  );
-  console.log(notation);
 }
 
 window.addEventListener("DOMContentLoaded", onWindowLoad);

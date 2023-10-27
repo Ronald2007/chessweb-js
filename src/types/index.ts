@@ -1,3 +1,4 @@
+export interface Move extends Position {}
 export interface Position {
   fen: string;
   board: Board;
@@ -35,8 +36,21 @@ export type Point = { x: number; y: number };
 
 export interface GameController {
   flip: (direction?: boolean) => boolean;
-  changePosition: (position: string | Position) => void;
-  clearBoard: () => void;
+  changePosition: (position: string | Position, animate?: boolean) => void;
+  clearBoard: (animate?: boolean) => void;
   getOrientation: () => boolean;
   destroy: () => void;
+  toggleCoordinates: (show?: boolean) => void;
+  getFen: () => string;
+  getPosition: () => Position;
+  makeMove?: (moves: PieceMove[], validate?: boolean) => Position;
+}
+
+export interface BoardConfig {
+  animationDuration?: number; // 150; done
+  flipped?: boolean; // false; done
+  draggable?: boolean; // true; done
+  playable?: boolean; // true; done
+  showCoordinates?: boolean; // false; done
+  onChange?: (position: Position, type: "newmove" | "changed") => void; // done
 }

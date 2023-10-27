@@ -62,8 +62,8 @@ export function translatePoint(
   flip: boolean = false
 ): string {
   return `translate(${
-    Math.abs((flip ? 7 : 0) - point.x / squareSize) * 100
-  }%, ${Math.abs((flip ? 7 : 0) - point.y / squareSize) * 100}%)`;
+    ((flip ? 7 : 0) - point.x / squareSize) * (flip ? 1 : -1) * 100
+  }%, ${((flip ? 7 : 0) - point.y / squareSize) * (flip ? 1 : -1) * 100}%)`;
 }
 
 export function emptyPosition(): Position {

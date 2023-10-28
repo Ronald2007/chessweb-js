@@ -1,12 +1,26 @@
 {
-  "name": "custom-dnd",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "name": "@ronhdez7/chessgamejs",
+  "version": "0.0.1",
+  "description": "A chess game component",
   "scripts": {
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "rollup": "rollup -c"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "ronald",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.5",
+    "rollup": "^4.1.5",
+    "rollup-plugin-dts": "^6.1.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "tslib": "^2.6.2",
+    "typescript": "^5.2.2"
+  },
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts"
 }

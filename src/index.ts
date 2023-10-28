@@ -24,13 +24,17 @@ import {
 import { findAllMoves, isKingInCheck } from "./lib/moves.js";
 import { findDifferences, playMove } from "./lib/utils.js";
 import { convertMoveToNotation } from "./lib/notation.js";
+import "./styles/board.css" assert { type: "stylesheet" };
 
-// root element, start position, callback with new position(newPosition)
-export function chessboard(
+export function chessgame(
   boardDiv: HTMLDivElement,
   startPosition: Position | string = INITIAL_FEN,
   boardConfig: BoardConfig = DEFAULT_BOARD_CONFIG
 ) {
+  if (typeof window === undefined) {
+    throw new Error("Window is undefined. Please use in browser.");
+  }
+
   const config = {
     ...DEFAULT_BOARD_CONFIG,
     ...boardConfig,

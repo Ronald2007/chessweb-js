@@ -40,7 +40,6 @@ export function chessboard(
   const overDiv = createElement("div", "square", "over", "hidden");
   const selectedDiv = createElement("div", "square", "selected", "hidden");
   const ghostDiv = createElement("div", "ghost", "piece", "hidden");
-  const rootEl = document.querySelector<HTMLHtmlElement>(":root");
 
   let BOARD_SIZE = 0,
     SQUARE_SIZE = 0,
@@ -55,6 +54,7 @@ export function chessboard(
   let flip = config.flipped;
 
   function initialize(): GameController {
+    // injectCSS();
     // create board size & add update on every resize
     setBoardSize();
     boardDiv.append(overDiv, selectedDiv, ghostDiv);
@@ -71,6 +71,13 @@ export function chessboard(
     setupBoardConfig();
 
     return createBoardController();
+  }
+
+  function injectCSS() {
+    const styleLink = document.createElement("link");
+    styleLink.rel = "stylesheet";
+    styleLink.href = "/styles/board.css";
+    document.head.appendChild(styleLink);
   }
 
   function setupBoardConfig() {
@@ -99,8 +106,9 @@ export function chessboard(
     const parentElement = boardDiv.parentElement;
     let size: number;
     if (!parentElement) {
-      if (!rootEl) return;
-      const { height, width } = rootEl.getBoundingClientRect();
+      const rootElement = document.querySelector(":root");
+      if (!rootElement) return;
+      const { height, width } = rootElement.getBoundingClientRect();
       size = clamp(height, width);
     } else {
       const { height, width } = parentElement.getBoundingClientRect();
@@ -111,10 +119,11 @@ export function chessboard(
     const padding = (size % 8) / 2;
     size = Math.floor(size / 8) * 8;
 
-    rootEl?.style.setProperty("--board-size", `${size}px`);
+    boardDiv.style.setProperty("--board-size", `${size}px`);
     boardDiv.style.margin = `${padding}px ${padding}px ${
       padding + coorBarLen
     }px ${padding + coorBarLen}px`;
+
     boardRect = boardDiv.getBoundingClientRect();
     BOARD_SIZE = boardRect.height;
     SQUARE_SIZE = BOARD_SIZE / 8;
@@ -122,9 +131,14 @@ export function chessboard(
   }
 
   function toggleCoordinates(show: boolean = true) {
+    let resize = false;
+    const coordinates = boardDiv.querySelectorAll(".coordinates");
     if (!show) {
-      boardDiv.querySelectorAll(".coordinates").forEach((el) => el.remove());
-    } else {
+      if (coordinates.length > 0) {
+        coordinates.forEach((el) => el.remove());
+        resize = true;
+      }
+    } else if (show && coordinates.length === 0) {
       const numbersBar = createElement("div", "coordinates", "vertical");
       for (let i = 0; i < 8; i++) {
         const coorDiv = createElement("div", "coor");
@@ -138,18 +152,19 @@ export function chessboard(
         lettersBar.append(coorDiv);
       }
       boardDiv.append(numbersBar, lettersBar);
+      resize = true;
     }
+    if (resize) setBoardSize();
     config.showCoordinates = show;
-    setBoardSize();
   }
 
   function setAnimationDurationTo(value: number) {
-    rootEl?.style.setProperty("--animation-duration", `${value}ms`);
+    boardDiv.style.setProperty("--animation-duration", `${value}ms`);
   }
 
   function flipBoard(direction?: boolean) {
     flip = direction !== undefined ? direction : !flip;
-    rootEl?.style.setProperty("--flip-rotation", `${flip ? 180 : 0}deg`);
+    boardDiv.style.setProperty("--flip-rotation", `${flip ? 180 : 0}deg`);
     return flip;
   }
 
@@ -410,17 +425,15 @@ export function chessboard(
       x: clamp(e.clientX - boardRect.left, BOARD_SIZE, 0),
       y: clamp(e.clientY - boardRect.top, BOARD_SIZE, 0),
     };
-    console.log(point);
 
-    dragTarget.style.transform =
-      translatePoint(
-        {
-          x: point.x - CENTER,
-          y: point.y - CENTER,
-        },
-        SQUARE_SIZE,
-        flip
-      ) + " scale(1.5)";
+    dragTarget.style.transform = translatePoint(
+      {
+        x: point.x - CENTER,
+        y: point.y - CENTER,
+      },
+      SQUARE_SIZE,
+      flip
+    );
 
     // show indicator on the square the piece is over
     const dropIndex = convertPointToIndex(point, SQUARE_SIZE, flip);

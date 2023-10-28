@@ -1,0 +1,218 @@
+.board > *,
+.board > *::after,
+.board > *::before {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.board {
+  --board-size: 100%;
+  --flip-rotation: 0deg;
+  --animation-duration: 150ms;
+  --over-square-color: black;
+  --selected-square-color: yellow;
+  --possible-move-color: black;
+  width: var(--board-size);
+  height: var(--board-size);
+  background-image: url(../assets/boards/green.svg);
+  background-repeat: no-repeat;
+  position: relative;
+  user-select: none;
+  rotate: var(--flip-rotation);
+}
+
+.board > .piece {
+  width: calc(var(--board-size) / 8);
+  height: calc(var(--board-size) / 8);
+  position: absolute;
+  touch-action: none;
+  z-index: 10;
+  user-select: none;
+  transition: transform var(--animation-duration);
+  /* overflow: hidden; */
+}
+
+.board > .piece::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transform: rotate(var(--flip-rotation));
+}
+
+.board > .piece.dragged {
+  z-index: 11;
+  transition: none;
+}
+
+.board > .piece.dragged::before {
+  width: 150%;
+  height: 150%;
+  top: -25%;
+  left: -25%;
+}
+
+.board > .piece.ghost {
+  z-index: 9;
+}
+
+.board > .square {
+  width: calc(var(--board-size) / 8);
+  height: calc(var(--board-size) / 8);
+  position: absolute;
+  z-index: 5;
+}
+
+.board > .square.over {
+  background-color: var(--over-square-color);
+  opacity: 0.3;
+  border-radius: 50%;
+  border: calc(var(--board-size) / 8) solid var(--over-square-color);
+  left: calc(var(--board-size) / -8 / 2);
+  top: calc(var(--board-size) / -8 / 2);
+  z-index: 8;
+}
+
+.board > .square.selected {
+  background-color: var(--selected-square-color);
+}
+
+.board > .square.possible-move::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.3;
+}
+
+.board > .square.possible-move.empty::after {
+  background-color: var(--possible-move-color);
+  width: 40%;
+  height: 40%;
+  left: 30%;
+  top: 30%;
+}
+
+.board > .square.possible-move.capture::after {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border: 5px solid var(--possible-move-color);
+}
+
+.board > .hidden {
+  display: none;
+}
+
+.board > .ghost {
+  opacity: 0.5;
+}
+
+.board > .promotion-dialog {
+  width: calc(var(--board-size) / 8);
+  height: calc(var(--board-size) / 2);
+  position: absolute;
+  background-color: white;
+  z-index: 12;
+  border: 1px solid black;
+  display: flex;
+  flex-direction: column;
+}
+
+.board > .promotion-dialog > .piece {
+  position: relative;
+}
+
+.board > .coordinates {
+  position: absolute;
+  display: grid;
+}
+
+.board > .coordinates.vertical {
+  height: var(--board-size);
+  width: calc(var(--board-size) / 8 / 4);
+  right: 100%;
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.board > .coordinates.horizontal {
+  height: calc(var(--board-size) / 8 / 4);
+  width: var(--board-size);
+  top: 100%;
+  grid-template-columns: repeat(8, 1fr);
+}
+
+.board > .coordinates > div.coor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board > .coordinates > div.coor > h6 {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.board > .number {
+  width: calc(var(--board-size) / 8);
+  height: calc(var(--board-size) / 8);
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pieces */
+
+/* White */
+.board > .piece.wp::before {
+  background-image: url("../assets/pieces/wp.svg");
+}
+
+.board > .piece.wk::before {
+  background-image: url("../assets/pieces/wk.svg");
+}
+
+.board > .piece.wq::before {
+  background-image: url("../assets/pieces/wq.svg");
+}
+
+.board > .piece.wr::before {
+  background-image: url("../assets/pieces/wr.svg");
+}
+
+.board > .piece.wb::before {
+  background-image: url("../assets/pieces/wb.svg");
+}
+
+.board > .piece.wn::before {
+  background-image: url("../assets/pieces/wn.svg");
+}
+
+/* Black */
+.board > .piece.bp::before {
+  background-image: url("../assets/pieces/bp.svg");
+}
+
+.board > .piece.bk::before {
+  background-image: url("../assets/pieces/bk.svg");
+}
+
+.board > .piece.bq::before {
+  background-image: url("../assets/pieces/bq.svg");
+}
+
+.board > .piece.br::before {
+  background-image: url("../assets/pieces/br.svg");
+}
+
+.board > .piece.bb::before {
+  background-image: url("../assets/pieces/bb.svg");
+}
+
+.board > .piece.bn::before {
+  background-image: url("../assets/pieces/bn.svg");
+}

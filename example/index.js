@@ -1,4 +1,4 @@
-import { chessgame } from "../dist/index.esm.js";
+import chessgame from "../dist/index.esm.js";
 
 const board = document.querySelector(".board");
 if (board) {

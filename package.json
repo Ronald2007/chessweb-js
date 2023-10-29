@@ -1,6 +1,6 @@
 {
   "name": "@ronhdez7/chessgamejs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A chess game component",
   "scripts": {
     "watch": "tsc -w",

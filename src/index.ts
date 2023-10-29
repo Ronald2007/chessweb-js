@@ -26,7 +26,7 @@ import { findDifferences, playMove } from "./lib/utils.js";
 import { convertMoveToNotation } from "./lib/notation.js";
 import "./styles/board.css" assert { type: "stylesheet" };
 
-export function chessgame(
+export default function chessgame(
   boardDiv: HTMLDivElement,
   startPosition: Position | string = INITIAL_FEN,
   boardConfig: BoardConfig = DEFAULT_BOARD_CONFIG
@@ -524,3 +524,5 @@ export function chessgame(
     }
   }
 }
+
+export * from "./lib";

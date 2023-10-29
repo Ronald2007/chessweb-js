@@ -13,13 +13,27 @@
   --over-square-color: black;
   --selected-square-color: yellow;
   --possible-move-color: black;
+  --wp-svg-url: url("");
+  --wk-svg-url: url("");
+  --wq-svg-url: url("");
+  --wr-svg-url: url("");
+  --wb-svg-url: url("");
+  --wn-svg-url: url("");
+  --bp-svg-url: url("");
+  --bk-svg-url: url("");
+  --bq-svg-url: url("");
+  --br-svg-url: url("");
+  --bb-svg-url: url("");
+  --bn-svg-url: url("");
+  --board-svg-url: url("")
+
   width: var(--board-size);
   height: var(--board-size);
-  background-image: url(../assets/boards/green.svg);
+  background-image: var(--board-svg-url);
   background-repeat: no-repeat;
   position: relative;
   user-select: none;
-  rotate: var(--flip-rotation);
+  transform: rotate(var(--flip-rotation));
 }
 
 .board > .piece {
@@ -30,7 +44,6 @@
   z-index: 10;
   user-select: none;
   transition: transform var(--animation-duration);
-  /* overflow: hidden; */
 }
 
 .board > .piece::before {
@@ -169,50 +182,50 @@
 
 /* White */
 .board > .piece.wp::before {
-  background-image: url("../assets/pieces/wp.svg");
+  background-image: var(--wp-svg-url);
 }
 
 .board > .piece.wk::before {
-  background-image: url("../assets/pieces/wk.svg");
+  background-image: var(--wk-svg-url);
 }
 
 .board > .piece.wq::before {
-  background-image: url("../assets/pieces/wq.svg");
+  background-image: var(--wq-svg-url);
 }
 
 .board > .piece.wr::before {
-  background-image: url("../assets/pieces/wr.svg");
+  background-image: var(--wr-svg-url);
 }
 
 .board > .piece.wb::before {
-  background-image: url("../assets/pieces/wb.svg");
+  background-image: var(--wb-svg-url);
 }
 
 .board > .piece.wn::before {
-  background-image: url("../assets/pieces/wn.svg");
+  background-image: var(--wn-svg-url);
 }
 
 /* Black */
 .board > .piece.bp::before {
-  background-image: url("../assets/pieces/bp.svg");
+  background-image: var(--bp-svg-url);
 }
 
 .board > .piece.bk::before {
-  background-image: url("../assets/pieces/bk.svg");
+  background-image: var(--bk-svg-url);
 }
 
 .board > .piece.bq::before {
-  background-image: url("../assets/pieces/bq.svg");
+  background-image: var(--bq-svg-url);
 }
 
 .board > .piece.br::before {
-  background-image: url("../assets/pieces/br.svg");
+  background-image: var(--br-svg-url);
 }
 
 .board > .piece.bb::before {
-  background-image: url("../assets/pieces/bb.svg");
+  background-image: var(--bb-svg-url);
 }
 
 .board > .piece.bn::before {
-  background-image: url("../assets/pieces/bn.svg");
+  background-image: var(--bn-svg-url);
 }

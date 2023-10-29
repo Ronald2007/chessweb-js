@@ -53,4 +53,6 @@ export interface BoardConfig {
   playable?: boolean; // true; done
   showCoordinates?: boolean; // false; done
   onChange?: (position: Position, type: "newmove" | "changed") => void; // done
+  pieceTheme?: ((piece: string) => string) | string | { [key: string]: string };
+  boardTheme?: "green" | "brown";
 }

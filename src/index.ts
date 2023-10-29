@@ -85,6 +85,24 @@ export function chessgame(
   }
 
   function setupBoardConfig() {
+    // piece theme
+    for (const piece of COLOR_PIECES) {
+      let pieceurl = "";
+      if (typeof config.pieceTheme === "string") {
+        pieceurl = config.pieceTheme + piece + ".svg";
+      } else if (typeof config.pieceTheme === "function") {
+        pieceurl = config.pieceTheme(piece);
+      } else {
+        pieceurl = config.pieceTheme[piece];
+      }
+      boardDiv.style.setProperty(`--${piece}-svg-url`, `url(${pieceurl})`);
+    }
+
+    // board background
+    const boardurl =
+      "https://upload.wikimedia.org/wikipedia/commons/2/25/Chessboard_green_squares.svg";
+    boardDiv.style.setProperty(`--board-svg-url`, `url(${boardurl})`);
+
     setAnimationDurationTo(config.animationDuration);
     flipBoard(config.flipped);
     if (config.playable) {

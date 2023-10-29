@@ -1,12 +1,14 @@
 {
   "name": "@ronhdez7/chessgamejs",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "A chess game component",
   "scripts": {
     "watch": "tsc -w",
     "rollup": "rollup -c"
   },
-  "keywords": [],
+  "keywords": [
+    "chess"
+  ],
   "author": "ronald",
   "license": "ISC",
   "devDependencies": {
@@ -17,8 +19,8 @@
     "tslib": "^2.6.2",
     "typescript": "^5.2.2"
   },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
   "files": [
     "dist"
   ],
